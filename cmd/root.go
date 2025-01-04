@@ -6,11 +6,19 @@ package cmd
 import (
 	"os"
 
+	"github.com/pliniogsnascimento/little-habits/pkg/db"
 	"github.com/pliniogsnascimento/little-habits/pkg/habit"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+	"go.uber.org/zap"
 )
 
-var service *habit.HabitService
+var (
+	service    habit.HabitService
+	cfgFile    string
+	logger     *zap.SugaredLogger
+	dbConnOpts *db.DbConnOpts
+)
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -41,9 +49,35 @@ func init() {
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
 
-	// rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.little-habits.yaml)")
+	// rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "$PWD/.little-habits.yaml", "config file (default is $HOME/.little-habits.yaml)")
+
+	viper.SetConfigFile(".little-habits.yaml")
+	viper.AddConfigPath("$PWD")
+	viper.AddConfigPath("$HOME")
+	err := viper.ReadInConfig()
+	if err != nil {
+		panic(err)
+	}
+
+	err = viper.UnmarshalKey("db", &dbConnOpts)
+	if err != nil {
+		panic(err)
+	}
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+
+	zapLogger, _ := zap.NewProduction()
+	defer zapLogger.Sync()
+	logger = zapLogger.Sugar()
+
+	logger.Debugln("db configs:", dbConnOpts)
+
+	gormDb, err := db.NewGormDb(dbConnOpts, logger)
+	if err != nil {
+		panic(err)
+	}
+
+	service = db.NewHabitRepo(gormDb, logger)
 }

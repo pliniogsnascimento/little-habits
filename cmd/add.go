@@ -1,12 +1,17 @@
 /*
 Copyright © 2025 NAME HERE <EMAIL ADDRESS>
-
 */
 package cmd
 
 import (
+	"errors"
 	"fmt"
+	"os"
+	"strings"
+	"text/tabwriter"
+	"time"
 
+	"github.com/pliniogsnascimento/little-habits/pkg/habit"
 	"github.com/spf13/cobra"
 )
 
@@ -20,21 +25,76 @@ and usage of using your command. For example:
 Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("add called")
-	},
+	RunE: executeAdd,
 }
 
 func init() {
 	rootCmd.AddCommand(addCmd)
+}
 
-	// Here you will define your flags and configuration settings.
+func executeAdd(cmd *cobra.Command, args []string) error {
+	if len(args) == 0 {
+		return errors.New("no name for new habit provided")
+	}
+	habits := []*habit.Habit{}
 
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// addCmd.PersistentFlags().String("foo", "", "A help for foo")
+	for _, value := range args {
+		newHabit := habit.NewHabit(value)
+		habits = append(habits, &newHabit)
+	}
 
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// addCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	_, err := service.CreateHabit(habits)
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("%s habit(s) created!", strings.Join(args, ", "))
+
+	return nil
+}
+
+func printHabits(habits []habit.Habit) {
+	w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', tabwriter.AlignRight)
+
+	fmt.Fprintln(w, "Name")
+	for _, value := range habits {
+		fmt.Fprintln(w, value.Name)
+	}
+}
+
+func printHabitsWeekProgress(habits []habit.Habit) {
+	w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', tabwriter.AlignRight)
+
+	weekdays := []time.Weekday{
+		time.Sunday,
+		time.Monday,
+		time.Tuesday,
+		time.Wednesday,
+		time.Thursday,
+		time.Friday,
+		time.Saturday,
+	}
+
+	header := []string{" "}
+	header = append(header, getHabitsNames(habits)...)
+	fmt.Fprintln(w, strings.Join(header, "\t"))
+
+	for _, day := range weekdays {
+		fmt.Fprintf(w, "%s\t", day)
+		for range habits {
+			fmt.Fprintf(w, "\t")
+		}
+		fmt.Fprintf(w, "\n")
+	}
+
+	w.Flush()
+}
+
+func getHabitsNames(habits []habit.Habit) (names []string) {
+	names = []string{}
+
+	for _, value := range habits {
+		names = append(names, value.Name)
+	}
+	return
 }
