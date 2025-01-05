@@ -10,3 +10,6 @@ db:
   # defaultMaxConnIdleTime:
   # defaultHealthCheckPeriod:
   # defaultConnectTimeout:
+log:
+  level: debug
+  encoder: console

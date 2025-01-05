@@ -2,6 +2,7 @@ package habit
 
 import "time"
 
+// TODO change this to single entity(no more DTOs)
 type Habit struct {
 	Name string
 	Plan *[]HabitPlan
@@ -25,5 +26,5 @@ type HabitService interface {
 	// GetMonthProgress is a function to get progess of all habits in the month.
 	GetMonthProgress(month time.Month) (*[]Habit, error)
 	GetHabitProgress(habitName string, month time.Month) (*Habit, error)
-	AddRecord(habit Habit, day time.Time) error
+	AddRecord(habitName string, plan HabitPlan) error
 }

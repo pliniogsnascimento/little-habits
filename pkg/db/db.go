@@ -48,6 +48,11 @@ func NewGormDb(opts *DbConnOpts, logger *zap.SugaredLogger) (*gorm.DB, error) {
 		return nil, err
 	}
 
+	err = db.AutoMigrate(&HabitPlanDTO{})
+	if err != nil {
+		return nil, err
+	}
+
 	return db, nil
 }
 

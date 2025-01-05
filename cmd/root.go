@@ -21,6 +21,7 @@ var (
 )
 
 // rootCmd represents the base command when called without any subcommands
+// TODO create CLI and server commands
 var rootCmd = &cobra.Command{
 	Use:   "little-habits",
 	Short: "A brief description of your application",
@@ -64,11 +65,16 @@ func init() {
 		panic(err)
 	}
 
-	// Cobra also supports local flags, which will only run
-	// when this action is called directly.
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	// var logCfg zap.Config
 
-	zapLogger, _ := zap.NewProduction()
+	// TODO understand this and make it work
+	// err = viper.UnmarshalKey("log", &logCfg)
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// zapLogger := zap.Must(logCfg.Build())
+
+	zapLogger, _ := zap.NewDevelopment()
 	defer zapLogger.Sync()
 	logger = zapLogger.Sugar()
 

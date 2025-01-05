@@ -55,6 +55,27 @@ func (h *HabitRepo) GetHabitProgress(habitName string, month time.Month) (*habit
 	return nil, nil
 }
 
-func (h *HabitRepo) AddRecord(habit habit.Habit, day time.Time) error {
+// TODO AddOrUpdateRecord
+func (h *HabitRepo) AddRecord(habitName string, plan habit.HabitPlan) error {
+	planDto := NewHabitPlanDTO(&plan)
+	var habit HabitDTO
+
+	err := h.gormDb.Where("name = ?", habitName).First(&habit).Error
+	if err != nil {
+		return err
+	}
+	err = h.gormDb.Debug().Model(&habit).Association("Plan").Append(&planDto)
+	if err != nil {
+		return err
+	}
+
+	var habitPlanList []HabitPlanDTO
+	err = h.gormDb.Model(&habit).Association("Plan").Find(&habitPlanList)
+	if err != nil {
+		return err
+	}
+
+	h.logger.Debugln(habitPlanList)
+
 	return nil
 }
