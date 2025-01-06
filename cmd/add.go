@@ -53,6 +53,7 @@ func executeAdd(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
+// TODO remove this and use helper
 func printHabits(habits []habit.Habit) {
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', tabwriter.AlignRight)
 
@@ -62,6 +63,7 @@ func printHabits(habits []habit.Habit) {
 	}
 }
 
+// TODO remove this and use helper
 func printHabitsWeekProgress(habits []habit.Habit) {
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', tabwriter.AlignRight)
 

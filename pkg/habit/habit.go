@@ -2,10 +2,9 @@ package habit
 
 import "time"
 
-// TODO change this to single entity(no more DTOs)
 type Habit struct {
 	Name string
-	Plan *[]HabitPlan
+	Plan map[string]bool
 }
 
 type HabitPlan struct {
@@ -23,7 +22,7 @@ type HabitService interface {
 
 	ListHabits() (*[]Habit, error)
 
-	// GetMonthProgress is a function to get progess of all habits in the month.
+	// GetMonthProgress is a function to get progress of all habits in the month.
 	GetMonthProgress(month time.Month) (*[]Habit, error)
 	GetHabitProgress(habitName string, month time.Month) (*Habit, error)
 	AddRecord(habitName string, plan HabitPlan) error

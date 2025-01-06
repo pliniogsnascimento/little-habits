@@ -57,16 +57,16 @@ func (h HabitDTOList) toEntity() *[]habit.Habit {
 }
 
 func (h HabitDTO) toEntity() habit.Habit {
-	plan := []habit.HabitPlan{}
+	plan := map[string]bool{}
 
 	if h.Plan != nil {
 		for _, value := range h.Plan {
-			plan = append(plan, habit.HabitPlan{Day: value.Day, Executed: value.Executed})
+			plan[value.Day.Format("yyyy-MM-dd")] = value.Executed
 		}
 	}
 
 	return habit.Habit{
 		Name: h.Name,
-		Plan: &plan,
+		Plan: plan,
 	}
 }
