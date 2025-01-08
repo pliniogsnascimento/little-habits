@@ -80,7 +80,7 @@ func init() {
 
 	logger.Debugln("db configs:", dbConnOpts)
 
-	gormDb, err := db.NewGormDb(dbConnOpts, logger)
+	gormDb, err := db.NewSQLiteGormDb("data.db", logger)
 	if err != nil {
 		panic(err)
 	}

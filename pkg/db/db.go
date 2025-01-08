@@ -6,6 +6,7 @@ import (
 
 	"go.uber.org/zap"
 	"gorm.io/driver/postgres"
+	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 
@@ -24,7 +25,7 @@ type DbConnOpts struct {
 	DefaultConnectTimeout    time.Duration
 }
 
-func NewGormDb(opts *DbConnOpts, logger *zap.SugaredLogger) (*gorm.DB, error) {
+func NewPostgresGormDb(opts *DbConnOpts, logger *zap.SugaredLogger) (*gorm.DB, error) {
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Shanghai",
 		opts.Host,
 		opts.User,
@@ -35,12 +36,23 @@ func NewGormDb(opts *DbConnOpts, logger *zap.SugaredLogger) (*gorm.DB, error) {
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	panicIfErr(err, logger)
 
-	// TODO uncomment code if is not needed
-	// dbConn, _ := db.DB()
-	// panicIfErr(err, logger)
+	// TODO add migrations
+	err = db.AutoMigrate(&HabitDTO{})
+	if err != nil {
+		return nil, err
+	}
 
-	// dbConn.Query("CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\"")
-	// panicIfErr(err, logger)
+	err = db.AutoMigrate(&HabitPlanDTO{})
+	if err != nil {
+		return nil, err
+	}
+
+	return db, nil
+}
+
+func NewSQLiteGormDb(filename string, logger *zap.SugaredLogger) (*gorm.DB, error) {
+	db, err := gorm.Open(sqlite.Open(filename), &gorm.Config{})
+	panicIfErr(err, logger)
 
 	// TODO add migrations
 	err = db.AutoMigrate(&HabitDTO{})
