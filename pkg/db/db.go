@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/pliniogsnascimento/little-habits/pkg/habit"
 	"go.uber.org/zap"
 	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"
@@ -37,12 +38,12 @@ func NewPostgresGormDb(opts *DbConnOpts, logger *zap.SugaredLogger) (*gorm.DB, e
 	panicIfErr(err, logger)
 
 	// TODO add migrations
-	err = db.AutoMigrate(&HabitDTO{})
+	err = db.AutoMigrate(&habit.Habit{})
 	if err != nil {
 		return nil, err
 	}
 
-	err = db.AutoMigrate(&HabitPlanDTO{})
+	err = db.AutoMigrate(&habit.HabitPlan{})
 	if err != nil {
 		return nil, err
 	}
@@ -55,12 +56,12 @@ func NewSQLiteGormDb(filename string, logger *zap.SugaredLogger) (*gorm.DB, erro
 	panicIfErr(err, logger)
 
 	// TODO add migrations
-	err = db.AutoMigrate(&HabitDTO{})
+	err = db.AutoMigrate(&habit.Habit{})
 	if err != nil {
 		return nil, err
 	}
 
-	err = db.AutoMigrate(&HabitPlanDTO{})
+	err = db.AutoMigrate(&habit.HabitPlan{})
 	if err != nil {
 		return nil, err
 	}

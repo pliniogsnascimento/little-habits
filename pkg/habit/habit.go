@@ -3,13 +3,17 @@ package habit
 import "time"
 
 type Habit struct {
-	Name string
-	Plan map[string]bool
+	ID        uint
+	Name      string      `gorm:"unique"`
+	Plan      []HabitPlan `gorm:"foreignKey:HabitID"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }
 
 type HabitPlan struct {
-	Day      time.Time
+	Day      time.Time `gorm:"type:date;primaryKey"`
 	Executed bool
+	HabitID  uint `gorm:"primaryKey"`
 }
 
 func NewHabit(name string) Habit {

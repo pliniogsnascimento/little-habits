@@ -23,13 +23,7 @@ func (db *HabitRepo) closeConnFromPool(conn *pgxpool.Conn) {
 }
 
 func (h *HabitRepo) CreateHabit(habits []*habit.Habit) ([]*habit.Habit, error) {
-	hDtos := []*HabitDTO{}
-
-	for _, habit := range habits {
-		hDtos = append(hDtos, NewHabitDTO(habit))
-	}
-
-	if err := h.gormDb.Create(hDtos).Error; err != nil {
+	if err := h.gormDb.Create(habits).Error; err != nil {
 		return nil, err
 	}
 
@@ -37,13 +31,13 @@ func (h *HabitRepo) CreateHabit(habits []*habit.Habit) ([]*habit.Habit, error) {
 }
 
 func (h *HabitRepo) ListHabits() (*[]habit.Habit, error) {
-	dtoList := HabitDTOList{}
+	habitList := []habit.Habit{}
 
-	result := h.gormDb.Find(&dtoList)
+	result := h.gormDb.Find(&habitList)
 	h.logger.Debugln(result.RowsAffected)
-	h.logger.Debugln(dtoList)
+	h.logger.Debugln(habitList)
 
-	return dtoList.toEntity(), nil
+	return &habitList, nil
 }
 
 // GetMonthProgress is a function to get progess of all habits in the month.
@@ -57,20 +51,20 @@ func (h *HabitRepo) GetHabitProgress(habitName string, month time.Month) (*habit
 
 // TODO AddOrUpdateRecord
 func (h *HabitRepo) AddRecord(habitName string, plan habit.HabitPlan) error {
-	planDto := NewHabitPlanDTO(&plan)
-	var habit HabitDTO
+	var existingHabit habit.Habit
 
-	err := h.gormDb.Where("name = ?", habitName).First(&habit).Error
-	if err != nil {
-		return err
-	}
-	err = h.gormDb.Debug().Model(&habit).Association("Plan").Append(&planDto)
+	err := h.gormDb.Where("name = ?", habitName).First(&existingHabit).Error
 	if err != nil {
 		return err
 	}
 
-	var habitPlanList []HabitPlanDTO
-	err = h.gormDb.Model(&habit).Association("Plan").Find(&habitPlanList)
+	err = h.gormDb.Debug().Model(&existingHabit).Association("Plan").Append(&plan)
+	if err != nil {
+		return err
+	}
+
+	var habitPlanList []habit.HabitPlan
+	err = h.gormDb.Model(&existingHabit).Association("Plan").Find(&habitPlanList)
 	if err != nil {
 		return err
 	}
