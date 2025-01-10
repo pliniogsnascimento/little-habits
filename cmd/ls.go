@@ -23,8 +23,8 @@ to quickly create a Cobra application.`,
 			return err
 		}
 
-		// printHabits(*habits)
-		printHabitsWeekProgress(*habits)
+		printHabits(*habits)
+		// utils.PrintHabitsWeekProgress(*habits)
 		return nil
 	},
 }

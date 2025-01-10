@@ -8,6 +8,7 @@ import (
 
 	"github.com/pliniogsnascimento/little-habits/pkg/db"
 	"github.com/pliniogsnascimento/little-habits/pkg/habit"
+	"github.com/pliniogsnascimento/little-habits/pkg/utils"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
@@ -18,6 +19,7 @@ var (
 	cfgFile    string
 	logger     *zap.SugaredLogger
 	dbConnOpts *db.DbConnOpts
+	pHelper    utils.PrinterHelper
 )
 
 // rootCmd represents the base command when called without any subcommands
@@ -46,10 +48,6 @@ func Execute() {
 }
 
 func init() {
-	// Here you will define your flags and configuration settings.
-	// Cobra supports persistent flags, which, if defined here,
-	// will be global for your application.
-
 	// rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "$PWD/.little-habits.yaml", "config file (default is $HOME/.little-habits.yaml)")
 
 	viper.SetConfigFile(".little-habits.yaml")
@@ -80,10 +78,13 @@ func init() {
 
 	logger.Debugln("db configs:", dbConnOpts)
 
+	// TODO add toggle for using local or api mode
 	gormDb, err := db.NewSQLiteGormDb("data.db", logger)
+	// gormDb, err := db.NewPostgresGormDb(dbConnOpts, logger)
 	if err != nil {
 		panic(err)
 	}
 
 	service = db.NewHabitRepo(gormDb, logger)
+	pHelper = utils.NewPrinterHelper(logger)
 }

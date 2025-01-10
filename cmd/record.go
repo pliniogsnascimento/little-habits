@@ -11,6 +11,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var executed bool
+
 // recordCmd represents the record command
 var recordCmd = &cobra.Command{
 	Use:   "record",
@@ -26,7 +28,9 @@ to quickly create a Cobra application.`,
 			return fmt.Errorf("input is no valid")
 		}
 
-		plan := habit.HabitPlan{Day: time.Now(), Executed: false}
+		loc := time.Now().Location()
+		day := time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day(), 0, 0, 0, 0, loc)
+		plan := habit.HabitPlan{Day: day, Executed: executed}
 		err := service.AddRecord(args[0], plan)
 		if err != nil {
 			return err
@@ -47,5 +51,5 @@ func init() {
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	// recordCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	recordCmd.Flags().BoolVarP(&executed, "executed", "e", false, "Help message for toggle")
 }

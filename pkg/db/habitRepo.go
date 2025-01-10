@@ -42,7 +42,14 @@ func (h *HabitRepo) ListHabits() (*[]habit.Habit, error) {
 
 // GetMonthProgress is a function to get progess of all habits in the month.
 func (h *HabitRepo) GetMonthProgress(month time.Month) (*[]habit.Habit, error) {
-	return nil, nil
+	var habitList []habit.Habit
+
+	err := h.gormDb.Preload("Plan").Find(&habitList).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return &habitList, nil
 }
 
 func (h *HabitRepo) GetHabitProgress(habitName string, month time.Month) (*habit.Habit, error) {

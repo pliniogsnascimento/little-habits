@@ -27,7 +27,7 @@ type DbConnOpts struct {
 }
 
 func NewPostgresGormDb(opts *DbConnOpts, logger *zap.SugaredLogger) (*gorm.DB, error) {
-	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Shanghai",
+	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=America/Sao_Paulo",
 		opts.Host,
 		opts.User,
 		opts.Password,
