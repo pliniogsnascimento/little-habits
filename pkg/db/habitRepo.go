@@ -56,7 +56,7 @@ func (h *HabitRepo) GetHabitProgress(habitName string, month time.Month) (*habit
 	return nil, nil
 }
 
-// TODO AddOrUpdateRecord
+// TODO: AddOrUpdateRecord
 func (h *HabitRepo) AddRecord(habitName string, plan habit.HabitPlan) error {
 	var existingHabit habit.Habit
 

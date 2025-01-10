@@ -23,7 +23,7 @@ var (
 )
 
 // rootCmd represents the base command when called without any subcommands
-// TODO create CLI and server commands
+// TODO: create CLI and server commands
 var rootCmd = &cobra.Command{
 	Use:   "little-habits",
 	Short: "A brief description of your application",
@@ -65,7 +65,7 @@ func init() {
 
 	// var logCfg zap.Config
 
-	// TODO understand this and make it work
+	// TODO: understand this and make it work
 	// err = viper.UnmarshalKey("log", &logCfg)
 	// if err != nil {
 	// 	panic(err)
@@ -78,7 +78,7 @@ func init() {
 
 	logger.Debugln("db configs:", dbConnOpts)
 
-	// TODO add toggle for using local or api mode
+	// TODO: add toggle for using local or api mode
 	gormDb, err := db.NewSQLiteGormDb("data.db", logger)
 	// gormDb, err := db.NewPostgresGormDb(dbConnOpts, logger)
 	if err != nil {

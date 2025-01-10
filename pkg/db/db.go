@@ -37,7 +37,7 @@ func NewPostgresGormDb(opts *DbConnOpts, logger *zap.SugaredLogger) (*gorm.DB, e
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	panicIfErr(err, logger)
 
-	// TODO add migrations
+	// TODO: add migrations
 	err = db.AutoMigrate(&habit.Habit{})
 	if err != nil {
 		return nil, err
@@ -55,7 +55,7 @@ func NewSQLiteGormDb(filename string, logger *zap.SugaredLogger) (*gorm.DB, erro
 	db, err := gorm.Open(sqlite.Open(filename), &gorm.Config{})
 	panicIfErr(err, logger)
 
-	// TODO add migrations
+	// TODO: add migrations
 	err = db.AutoMigrate(&habit.Habit{})
 	if err != nil {
 		return nil, err
