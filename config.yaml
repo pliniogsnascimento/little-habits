@@ -1,0 +1,17 @@
+mode: development
+dbPath: data.db
+db:
+  user: postgres
+  password: pass1234
+  host: localhost
+  port: 5432
+  database: littlehabits
+  # defaultMaxConns:
+  # defaultMinConns:
+  # defaultMaxConnLifetime:
+  # defaultMaxConnIdleTime:
+  # defaultHealthCheckPeriod:
+  # defaultConnectTimeout:
+log:
+  level: debug
+  encoder: console
