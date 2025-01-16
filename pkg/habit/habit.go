@@ -27,7 +27,7 @@ type HabitService interface {
 	ListHabits() (*[]Habit, error)
 
 	// GetMonthProgress is a function to get progress of all habits in the month.
-	GetMonthProgress(month time.Month) (*[]Habit, error)
+	GetHabitsByPlanInTimeRange(init, end time.Time) (*[]Habit, error)
 	GetHabitProgress(habitName string, month time.Month) (*Habit, error)
 	AddRecord(habitName string, plan HabitPlan) error
 }

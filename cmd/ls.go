@@ -23,7 +23,7 @@ to quickly create a Cobra application.`,
 			return err
 		}
 
-		printHabits(*habits)
+		pHelper.PrintHabits(*habits)
 		// utils.PrintHabitsWeekProgress(*habits)
 		return nil
 	},

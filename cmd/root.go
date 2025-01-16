@@ -5,6 +5,7 @@ package cmd
 
 import (
 	"os"
+	"path"
 
 	"github.com/pliniogsnascimento/little-habits/pkg/db"
 	"github.com/pliniogsnascimento/little-habits/pkg/habit"
@@ -12,6 +13,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
+	"gorm.io/gorm"
 )
 
 var (
@@ -23,7 +25,6 @@ var (
 )
 
 // rootCmd represents the base command when called without any subcommands
-// TODO: create CLI and server commands
 var rootCmd = &cobra.Command{
 	Use:   "little-habits",
 	Short: "A brief description of your application",
@@ -49,16 +50,13 @@ func Execute() {
 
 func init() {
 	// rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "$PWD/.little-habits.yaml", "config file (default is $HOME/.little-habits.yaml)")
+	var err error
+	var gormDb *gorm.DB
 
-	viper.SetConfigFile(".little-habits.yaml")
-	viper.AddConfigPath("$PWD")
-	viper.AddConfigPath("$HOME")
-	err := viper.ReadInConfig()
-	if err != nil {
-		panic(err)
-	}
-
-	err = viper.UnmarshalKey("db", &dbConnOpts)
+	viper.SetConfigFile("config.yaml")
+	viper.AddConfigPath(".")
+	viper.AddConfigPath("$HOME/.little-habits")
+	err = viper.ReadInConfig()
 	if err != nil {
 		panic(err)
 	}
@@ -78,9 +76,21 @@ func init() {
 
 	logger.Debugln("db configs:", dbConnOpts)
 
-	// TODO: add toggle for using local or api mode
-	gormDb, err := db.NewSQLiteGormDb("data.db", logger)
-	// gormDb, err := db.NewPostgresGormDb(dbConnOpts, logger)
+	switch viper.Get("mode") {
+	case "development":
+		dbPath := path.Join(os.Getenv("PWD"), "data.db")
+		gormDb, err = db.NewSQLiteGormDb(dbPath, logger)
+	case "server":
+		err = viper.UnmarshalKey("db", &dbConnOpts)
+		if err != nil {
+			panic(err)
+		}
+		gormDb, err = db.NewPostgresGormDb(dbConnOpts, logger)
+	default:
+		dbPath := path.Join(os.Getenv("HOME"), ".little-habits", "data.db")
+		gormDb, err = db.NewSQLiteGormDb(dbPath, logger)
+	}
+
 	if err != nil {
 		panic(err)
 	}

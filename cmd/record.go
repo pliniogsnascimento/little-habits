@@ -11,7 +11,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var executed bool
+var (
+	executed bool
+	day      string
+)
 
 // recordCmd represents the record command
 var recordCmd = &cobra.Command{
@@ -28,10 +31,21 @@ to quickly create a Cobra application.`,
 			return fmt.Errorf("input is no valid")
 		}
 
+		var recordDate time.Time
+		var err error
+
 		loc := time.Now().Location()
-		day := time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day(), 0, 0, 0, 0, loc)
-		plan := habit.HabitPlan{Day: day, Executed: executed}
-		err := service.AddRecord(args[0], plan)
+		recordDate = time.Date(time.Now().Year(), time.Now().Month(), time.Now().Day(), 0, 0, 0, 0, loc)
+		if day != "" {
+			providedDate, err := time.Parse("2006-01-02", day)
+			if err != nil {
+				return err
+			}
+			recordDate = time.Date(providedDate.Year(), providedDate.Month(), providedDate.Day(), 0, 0, 0, 0, loc)
+		}
+
+		plan := habit.HabitPlan{Day: recordDate, Executed: executed}
+		err = service.AddRecord(args[0], plan)
 		if err != nil {
 			return err
 		}
@@ -42,14 +56,6 @@ to quickly create a Cobra application.`,
 
 func init() {
 	rootCmd.AddCommand(recordCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// recordCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
 	recordCmd.Flags().BoolVarP(&executed, "executed", "e", false, "Help message for toggle")
+	recordCmd.Flags().StringVarP(&day, "date", "d", "", "Help message for toggle")
 }

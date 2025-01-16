@@ -19,6 +19,12 @@ func NewPrinterHelper(logger *zap.SugaredLogger) PrinterHelper {
 	return PrinterHelper{logger: logger}
 }
 
+func (h *PrinterHelper) PrintHabits(habits []habit.Habit) {
+	for _, v := range habits {
+		fmt.Println(v)
+	}
+}
+
 func (h *PrinterHelper) PrintHabitsWeekProgress(habits []habit.Habit) {
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', tabwriter.TabIndent)
 
@@ -26,7 +32,7 @@ func (h *PrinterHelper) PrintHabitsWeekProgress(habits []habit.Habit) {
 	header = append(header, GetHabitsNames(habits)...)
 	fmt.Fprintln(w, strings.Join(header, "\t"))
 
-	dates := getWeekDates(time.Now())
+	dates := GetWeekDates(time.Now())
 
 	for _, day := range dates {
 		fmt.Fprintf(w, "%d %s\t", day.Day(), day.Weekday())
@@ -78,7 +84,7 @@ func (h *PrinterHelper) PrintHabitsMonthProgress(habits []habit.Habit) {
 	w.Flush()
 }
 
-func getWeekDates(filter time.Time) []time.Time {
+func GetWeekDates(filter time.Time) []time.Time {
 	dates := []time.Time{}
 	loc := time.Now().Location()
 	first := time.Date(filter.Year(), filter.Month(), (filter.Day() - int(filter.Weekday())), 0, 0, 0, 0, loc)

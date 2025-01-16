@@ -7,6 +7,7 @@ import (
 	"github.com/pliniogsnascimento/little-habits/pkg/habit"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type HabitRepo struct {
@@ -40,20 +41,33 @@ func (h *HabitRepo) ListHabits() (*[]habit.Habit, error) {
 	return &habitList, nil
 }
 
-// GetMonthProgress is a function to get progess of all habits in the month.
-func (h *HabitRepo) GetMonthProgress(month time.Month) (*[]habit.Habit, error) {
-	var habitList []habit.Habit
+func (h *HabitRepo) GetHabitsByPlanInTimeRange(init, end time.Time) (*[]habit.Habit, error) {
+	habitList := []habit.Habit{}
+	habitPlanList := []habit.HabitPlan{}
 
-	err := h.gormDb.Preload("Plan").Find(&habitList).Error
+	h.logger.Debugln(init, end)
+
+	err := h.gormDb.
+		Preload("Plan", "day BETWEEN ? AND ?", init, end).
+		Find(&habitList).Error
 	if err != nil {
 		return nil, err
 	}
+
+	h.logger.Debugln(habitList, habitPlanList)
 
 	return &habitList, nil
 }
 
 func (h *HabitRepo) GetHabitProgress(habitName string, month time.Month) (*habit.Habit, error) {
-	return nil, nil
+	var habit habit.Habit
+
+	err := h.gormDb.Preload("Plan").Where("name = ?", habitName).First(&habit).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return &habit, nil
 }
 
 // TODO: AddOrUpdateRecord
@@ -65,7 +79,7 @@ func (h *HabitRepo) AddRecord(habitName string, plan habit.HabitPlan) error {
 		return err
 	}
 
-	err = h.gormDb.Debug().Model(&existingHabit).Association("Plan").Append(&plan)
+	err = h.gormDb.Debug().Clauses(clause.OnConflict{UpdateAll: true}).Model(&existingHabit).Association("Plan").Append(&plan)
 	if err != nil {
 		return err
 	}

@@ -4,9 +4,9 @@ Copyright © 2025 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"fmt"
 	"time"
 
+	"github.com/pliniogsnascimento/little-habits/pkg/utils"
 	"github.com/spf13/cobra"
 )
 
@@ -21,9 +21,8 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		fmt.Println("progress called")
-
-		habits, err := service.GetMonthProgress(time.Now().Month())
+		weekDates := utils.GetWeekDates(time.Now())
+		habits, err := service.GetHabitsByPlanInTimeRange(weekDates[0], weekDates[6])
 		if err != nil {
 			return err
 		}
