@@ -25,24 +25,34 @@ func (h *PrinterHelper) PrintHabits(habits []habit.Habit) {
 	}
 }
 
-func (h *PrinterHelper) PrintHabitsWeekProgress(habits []habit.Habit) {
-	w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, '.', tabwriter.Debug)
+func (h *PrinterHelper) PrintHabitsProgressInRange(habits []habit.Habit, dates []time.Time) {
+	w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', tabwriter.TabIndent)
 
-	header := []string{" "}
-	header = append(header, GetHabitsNames(habits)...)
-	fmt.Fprintln(w, strings.Join(header, "\t"))
+	header, div := getHeaderAndDiv(GetHabitsNames(habits))
+	fmt.Fprintln(w, header)
 
-	dates := GetWeekDates(time.Now())
-
-	for _, day := range dates {
+	for i, day := range dates {
+		if day.Weekday() == 0 && i > 0 {
+			fmt.Fprint(w, div)
+		}
 		fmt.Fprintf(w, "%d %s\t", day.Day(), day.Weekday())
 		for _, v := range habits {
+			h.logger.Debugln(v)
 			fmt.Fprint(w, getHabitOut(0, v, day, h.logger))
 		}
 		fmt.Fprintln(w)
 	}
 
 	w.Flush()
+}
+
+func GetHabitsNames(habits []habit.Habit) (names []string) {
+	names = []string{}
+
+	for _, value := range habits {
+		names = append(names, value.Name)
+	}
+	return
 }
 
 func getHabitOut(i int, habit habit.Habit, day time.Time, logger *zap.SugaredLogger) string {
@@ -69,62 +79,17 @@ func getHabitOut(i int, habit habit.Habit, day time.Time, logger *zap.SugaredLog
 	return getHabitOut(i, habit, day, logger)
 }
 
-func (h *PrinterHelper) PrintHabitsMonthProgress(habits []habit.Habit) {
-	w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', tabwriter.TabIndent)
+func getHeaderAndDiv(headerList []string) (string, string) {
+	header, divider := []string{" "}, []string{}
+	header = append(header, headerList...)
+	headerText := strings.Join(header, "\t")
 
-	header := []string{" "}
-	header = append(header, GetHabitsNames(habits)...)
-	fmt.Fprintln(w, strings.Join(header, "\t"))
-
-	dates := getMonthDates(time.Now().Month(), 2025)
-
-	for _, day := range dates {
-		fmt.Fprintf(w, "%d %s\t", day.Day(), day.Weekday())
-		for _, v := range habits {
-			h.logger.Debugln(v)
-			fmt.Fprintf(w, "%s\t", "x")
-		}
-		if day.Weekday() == 6 {
-			w.Flush()
-			fmt.Fprintf(os.Stdout, "\n%s\n", strings.Repeat("-", 30))
-			w = tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', tabwriter.TabIndent)
-			fmt.Fprintln(w, strings.Join(header, "\t"))
-		} else {
-			fmt.Fprintf(w, "\n")
-		}
+	for range header {
+		divider = append(divider, strings.Repeat("-", 6))
 	}
 
-	w.Flush()
-}
+	div := strings.Join(divider, "\t")
+	div += "\n"
 
-func GetWeekDates(filter time.Time) []time.Time {
-	dates := []time.Time{}
-	loc := time.Now().Location()
-	first := time.Date(filter.Year(), filter.Month(), (filter.Day() - int(filter.Weekday())), 0, 0, 0, 0, loc)
-
-	for i := 0; i < 7; i++ {
-		dates = append(dates, first)
-		first = first.Add(time.Duration(24) * time.Hour)
-	}
-	return dates
-}
-
-func getMonthDates(mFilter time.Month, yFilter int) []time.Time {
-	dates := []time.Time{}
-	loc := time.Now().Location()
-	first := time.Date(yFilter, mFilter, 1, 0, 0, 0, 0, loc)
-
-	for month := first.Month(); month == first.Month(); first = first.AddDate(0, 0, 1) {
-		dates = append(dates, first)
-	}
-	return dates
-}
-
-func GetHabitsNames(habits []habit.Habit) (names []string) {
-	names = []string{}
-
-	for _, value := range habits {
-		names = append(names, value.Name)
-	}
-	return
+	return headerText, div
 }

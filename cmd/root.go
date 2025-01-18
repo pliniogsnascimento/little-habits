@@ -4,7 +4,6 @@ Copyright © 2025 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"fmt"
 	"os"
 	"path"
 
@@ -55,8 +54,8 @@ func init() {
 	var gormDb *gorm.DB
 
 	viper.SetConfigFile("config.yaml")
-	viper.AddConfigPath(".")
 	viper.AddConfigPath("$HOME/.little-habits")
+	viper.AddConfigPath("$PWD")
 	err = viper.ReadInConfig()
 	if err != nil {
 		panic(err)
@@ -71,27 +70,27 @@ func init() {
 	// }
 	// zapLogger := zap.Must(logCfg.Build())
 
-	zapLogger, _ := zap.NewDevelopment()
-	// zapLogger, _ := zap.NewProduction()
-	defer zapLogger.Sync()
-	logger = zapLogger.Sugar()
-
-	logger.Debugln("db configs:", dbConnOpts)
-
 	switch viper.Get("mode") {
 	case "development":
-		fmt.Println("Here")
-		// zapLogger, _ = zap.NewDevelopment()
+		// zapLogger, _ := zap.NewDevelopment()
+		zapLogger, _ := zap.NewProduction()
+		defer zapLogger.Sync()
+		logger = zapLogger.Sugar()
 		dbPath := path.Join(os.Getenv("PWD"), "data.db")
 		gormDb, err = db.NewSQLiteGormDb(dbPath, logger)
 	case "server":
+		zapLogger, _ := zap.NewProduction()
+		defer zapLogger.Sync()
+		logger = zapLogger.Sugar()
 		err = viper.UnmarshalKey("db", &dbConnOpts)
 		if err != nil {
 			panic(err)
 		}
 		gormDb, err = db.NewPostgresGormDb(dbConnOpts, logger)
 	default:
-		// zapLogger, _ = zap.NewProduction()
+		zapLogger, _ := zap.NewProduction()
+		defer zapLogger.Sync()
+		logger = zapLogger.Sugar()
 		dbPath := path.Join(os.Getenv("HOME"), ".little-habits", "data.db")
 		gormDb, err = db.NewSQLiteGormDb(dbPath, logger)
 	}
