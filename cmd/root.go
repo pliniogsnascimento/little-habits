@@ -4,6 +4,7 @@ Copyright © 2025 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"fmt"
 	"os"
 	"path"
 
@@ -53,12 +54,13 @@ func init() {
 	var err error
 	var gormDb *gorm.DB
 
+	// TODO: Not loading config from home dir
 	viper.SetConfigFile("config.yaml")
-	viper.AddConfigPath("$HOME/.little-habits")
 	viper.AddConfigPath("$PWD")
+	viper.AddConfigPath("$HOME/.little-habits")
 	err = viper.ReadInConfig()
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
 	}
 
 	// var logCfg zap.Config
