@@ -4,6 +4,7 @@ Copyright © 2025 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"fmt"
 	"os"
 	"path"
 
@@ -71,6 +72,7 @@ func init() {
 	// zapLogger := zap.Must(logCfg.Build())
 
 	zapLogger, _ := zap.NewDevelopment()
+	// zapLogger, _ := zap.NewProduction()
 	defer zapLogger.Sync()
 	logger = zapLogger.Sugar()
 
@@ -78,6 +80,8 @@ func init() {
 
 	switch viper.Get("mode") {
 	case "development":
+		fmt.Println("Here")
+		// zapLogger, _ = zap.NewDevelopment()
 		dbPath := path.Join(os.Getenv("PWD"), "data.db")
 		gormDb, err = db.NewSQLiteGormDb(dbPath, logger)
 	case "server":
@@ -87,6 +91,7 @@ func init() {
 		}
 		gormDb, err = db.NewPostgresGormDb(dbConnOpts, logger)
 	default:
+		// zapLogger, _ = zap.NewProduction()
 		dbPath := path.Join(os.Getenv("HOME"), ".little-habits", "data.db")
 		gormDb, err = db.NewSQLiteGormDb(dbPath, logger)
 	}

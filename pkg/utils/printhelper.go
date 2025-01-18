@@ -25,8 +25,9 @@ func (h *PrinterHelper) PrintHabits(habits []habit.Habit) {
 	}
 }
 
+// TODO: There is a bug here when skipping. It skips every time the date doesn't match. It should only skip once at the end of loop
 func (h *PrinterHelper) PrintHabitsWeekProgress(habits []habit.Habit) {
-	w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', tabwriter.TabIndent)
+	w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, '.', tabwriter.Debug)
 
 	header := []string{" "}
 	header = append(header, GetHabitsNames(habits)...)
@@ -38,15 +39,18 @@ func (h *PrinterHelper) PrintHabitsWeekProgress(habits []habit.Habit) {
 		fmt.Fprintf(w, "%d %s\t", day.Day(), day.Weekday())
 		for _, v := range habits {
 			for _, planned := range v.Plan {
-				h.logger.Debugln("comparing", day, "and", planned.Day, ":", planned.Day.Compare(day))
+				h.logger.Debugf("[%s]comparing %s and %s: %d", v.Name, day, planned.Day, planned.Day.Compare(day))
 				if planned.Day.Compare(day) == 0 {
 					if planned.Executed {
 						fmt.Fprintf(w, "%s\t", "x")
+						h.logger.Debugf("[%s]adding %s to %s", v.Name, "x", planned.Day)
 					} else {
 						fmt.Fprintf(w, "%s\t", "o")
+						h.logger.Debugf("[%s]adding %s to %s", v.Name, "o", planned.Day)
 					}
 				} else {
 					fmt.Fprintf(w, "%s\t", " ")
+					h.logger.Debugf("[%s]skipping %s", v.Name, day)
 				}
 			}
 		}

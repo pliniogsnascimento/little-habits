@@ -7,7 +7,6 @@ import (
 	"github.com/pliniogsnascimento/little-habits/pkg/habit"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
-	"gorm.io/gorm/clause"
 )
 
 type HabitRepo struct {
@@ -79,7 +78,8 @@ func (h *HabitRepo) AddRecord(habitName string, plan habit.HabitPlan) error {
 		return err
 	}
 
-	err = h.gormDb.Debug().Clauses(clause.OnConflict{UpdateAll: true}).Model(&existingHabit).Association("Plan").Append(&plan)
+	existingHabit.Plan = append(existingHabit.Plan, plan)
+	err = h.gormDb.Session(&gorm.Session{FullSaveAssociations: true}).Debug().Save(&existingHabit).Error
 	if err != nil {
 		return err
 	}
