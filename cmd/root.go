@@ -74,8 +74,7 @@ func init() {
 
 	switch viper.Get("mode") {
 	case "development":
-		// zapLogger, _ := zap.NewDevelopment()
-		zapLogger, _ := zap.NewProduction()
+		zapLogger, _ := zap.NewDevelopment()
 		defer zapLogger.Sync()
 		logger = zapLogger.Sugar()
 		dbPath := path.Join(os.Getenv("PWD"), "data.db")

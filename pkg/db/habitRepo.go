@@ -69,7 +69,6 @@ func (h *HabitRepo) GetHabitProgress(habitName string, month time.Month) (*habit
 	return &habit, nil
 }
 
-// TODO: AddOrUpdateRecord
 func (h *HabitRepo) AddRecord(habitName string, plan habit.HabitPlan) error {
 	var existingHabit habit.Habit
 
@@ -79,18 +78,10 @@ func (h *HabitRepo) AddRecord(habitName string, plan habit.HabitPlan) error {
 	}
 
 	existingHabit.Plan = append(existingHabit.Plan, plan)
-	err = h.gormDb.Session(&gorm.Session{FullSaveAssociations: true}).Debug().Save(&existingHabit).Error
+	err = h.gormDb.Session(&gorm.Session{FullSaveAssociations: true}).Save(&existingHabit).Error
 	if err != nil {
 		return err
 	}
-
-	var habitPlanList []habit.HabitPlan
-	err = h.gormDb.Model(&existingHabit).Association("Plan").Find(&habitPlanList)
-	if err != nil {
-		return err
-	}
-
-	h.logger.Debugln(habitPlanList)
 
 	return nil
 }

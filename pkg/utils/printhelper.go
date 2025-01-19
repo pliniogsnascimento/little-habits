@@ -65,7 +65,7 @@ func getHabitOut(i int, habit habit.Habit, day time.Time, logger *zap.SugaredLog
 	}
 
 	if habit.Plan[i].Day.Compare(day) == 0 {
-		if habit.Plan[0].Executed {
+		if habit.Plan[i].Executed {
 			out = fmt.Sprintf("%s\t", "x")
 			logger.Debugf("[%s]adding %s to %s", habit.Name, "x", habit.Plan[i].Day)
 			return out
