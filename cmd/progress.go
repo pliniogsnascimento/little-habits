@@ -36,27 +36,29 @@ Usage:
 Important Notes:
   The --month flag filters data for the specified month in the current year only.
   Ensure the value for the --month flag is within the range of 1 to 12; otherwise, an error will occur.`,
-	RunE: func(cmd *cobra.Command, args []string) error {
-		if month > 12 {
-			return fmt.Errorf("%d month is invalid", month)
-		}
-		var dateList []time.Time
+	RunE: printProgress,
+}
 
-		if month == 0 {
-			dateList = utils.GetWeekDates(time.Now())
-		} else {
-			dateList = utils.GetMonthDates(time.Month(month), time.Now().Year())
-		}
+func printProgress(cmd *cobra.Command, args []string) error {
+	if month > 12 {
+		return fmt.Errorf("%d month is invalid", month)
+	}
+	var dateList []time.Time
 
-		habits, err := service.GetHabitsByPlanInTimeRange(dateList[0], dateList[len(dateList)-1])
-		if err != nil {
-			return err
-		}
-		logger.Debugln(habits)
+	if month == 0 {
+		dateList = utils.GetWeekDates(time.Now())
+	} else {
+		dateList = utils.GetMonthDates(time.Month(month), time.Now().Year())
+	}
 
-		pHelper.PrintHabitsProgressInRange(*habits, dateList)
-		return nil
-	},
+	habits, err := service.GetHabitsByPlanInTimeRange(dateList[0], dateList[len(dateList)-1])
+	if err != nil {
+		return err
+	}
+	logger.Debugln(habits)
+
+	pHelper.PrintHabitsProgressInRange(*habits, dateList)
+	return nil
 }
 
 func init() {

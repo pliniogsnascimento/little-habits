@@ -16,6 +16,7 @@ var (
 	dates    []string
 )
 
+// TODO: Add a delete flag
 // recordCmd represents the record command
 var recordCmd = &cobra.Command{
 	Use:   "record",
@@ -70,7 +71,7 @@ Important:
 				fmt.Println(err)
 			}
 		}
-
+		printProgress(cmd, []string{})
 		return nil
 	},
 }
