@@ -15,13 +15,25 @@ import (
 // addCmd represents the add command
 var addCmd = &cobra.Command{
 	Use:   "add",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
+	Short: "Adds one or more habits to the database.",
+	Long: `The add command accepts a list of strings as arguments, representing the names of the habits to be stored in the database. Each habit name provided will be added as a new entry.
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+Examples:
+  # Add multiple habits: daily-walk and work-out
+  little-habits add run daily-walk work-out
+
+  # Add a single habit: meditation
+  little-habits add meditation
+
+Options:
+  (No options available for this command.)
+
+Usage:
+  little-habits add <habit-name> [<habit-name> ...]
+
+Important Notes:
+  Ensure the habit names are unique to avoid duplicate entries in the database.
+  If a habit with the same name already exists, it will not be added again.`,
 	RunE: executeAdd,
 }
 

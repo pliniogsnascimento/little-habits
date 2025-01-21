@@ -16,13 +16,26 @@ var month uint
 // progressCmd represents the progress command
 var progressCmd = &cobra.Command{
 	Use:   "progress",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
+	Short: "Displays the progress of all habits for the current week or a specified month of the current year.",
+	Long: `The progress command displays the progress of all habits. By default, it shows the progress for the current week. If the --month flag is provided, it displays the progress for the specified month of the current year.
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+Examples:
+  # Show progress for the current week
+  little-habits progress
+
+  # Show progress for December
+  little-habits progress --month=12
+
+Options:
+  --month=<int>:
+    An optional flag to filter progress by a specific month. Accepts an integer from 1 (January) to 12 (December). Defaults to the current week if not provided.
+
+Usage:
+  little-habits progress [options]
+
+Important Notes:
+  The --month flag filters data for the specified month in the current year only.
+  Ensure the value for the --month flag is within the range of 1 to 12; otherwise, an error will occur.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if month > 12 {
 			return fmt.Errorf("%d month is invalid", month)
@@ -48,15 +61,5 @@ to quickly create a Cobra application.`,
 
 func init() {
 	rootCmd.AddCommand(progressCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// progressCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// progressCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-	progressCmd.Flags().UintVar(&month, "month", 0, "month")
+	progressCmd.Flags().UintVarP(&month, "month", "m", 0, "An optional flag to filter progress by a specific month.")
 }
