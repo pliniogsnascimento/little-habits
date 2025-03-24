@@ -85,3 +85,14 @@ func (h *HabitRepo) AddRecord(habitName string, plan habit.HabitPlan) error {
 
 	return nil
 }
+
+func (h *HabitRepo) DeleteRecord(habitName string, date time.Time) error {
+	var plan habit.HabitPlan
+
+	err := h.gormDb.Delete(&plan).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

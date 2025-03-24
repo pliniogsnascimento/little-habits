@@ -42,6 +42,13 @@ func (h *PrinterHelper) PrintHabitsProgressInRange(habits []habit.Habit, dates [
 		}
 		fmt.Fprintln(w)
 	}
+	fmt.Fprint(w, div)
+	fmt.Fprint(w, " \t")
+	for _, v := range habits {
+		h.logger.Debugf("Getting stats for %s", v.Name)
+		fmt.Fprintf(w, "%.2f%s\t", v.GetStats(), "%")
+	}
+	fmt.Fprintln(w)
 
 	w.Flush()
 }
@@ -85,7 +92,7 @@ func getHeaderAndDiv(headerList []string) (string, string) {
 	headerText := strings.Join(header, "\t")
 
 	for range header {
-		divider = append(divider, strings.Repeat("-", 6))
+		divider = append(divider, strings.Repeat("-", 13))
 	}
 
 	div := strings.Join(divider, "\t")

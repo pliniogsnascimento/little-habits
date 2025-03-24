@@ -13,6 +13,7 @@ import (
 
 var (
 	executed bool
+	remove   bool
 	dates    []string
 )
 
@@ -46,7 +47,7 @@ Important:
   Dates must be formatted correctly (YYYY-MM-DD). Providing an invalid format will result in a parse error.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if len(args) != 1 {
-			return fmt.Errorf("input is no valid")
+			return fmt.Errorf("input is not valid")
 		}
 
 		var recordDate time.Time
@@ -79,5 +80,7 @@ Important:
 func init() {
 	rootCmd.AddCommand(recordCmd)
 	recordCmd.Flags().BoolVarP(&executed, "executed", "e", false, "Specify whether the habit was executed.")
+	// TODO: Implement the log deletion
+	recordCmd.Flags().BoolVarP(&remove, "remove", "r", false, "Remove a habit log.")
 	recordCmd.Flags().StringArrayVarP(&dates, "dates", "d", []string{}, "Accepts an array of strings representing dates in the format YYYY-MM-DD. These dates are converted into time.Time objects. If no date is provided, the current day is used.")
 }
